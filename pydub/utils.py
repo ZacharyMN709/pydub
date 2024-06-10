@@ -5,11 +5,15 @@ import json
 import os
 import re
 import sys
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
 from math import log, ceil
 from tempfile import TemporaryFile
 from warnings import warn
 from functools import wraps
+
+import platform  
+OS_TYPE = platform.system()  
+
 
 try:
     import audioop
@@ -34,6 +38,18 @@ ARRAY_RANGES = {
     16: (-0x8000, 0x7fff),
     32: (-0x80000000, 0x7fffffff),
 }
+
+
+def run_command(command, stdin, stdout, stderr):
+    if OS_TYPE == 'Windows':
+        startupinfo = STARTUPINFO()  
+        startupinfo.dwFlags |= STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = SW_HIDE
+        p = Popen(command, stdin=stdin, stdout=stdout, stderr=stderr, startupinfo=startupinfo)
+    else:  
+        p = Popen(command, stdin=stdin, stdout=stdout, stderr=stderr)
+
+    return p
 
 
 def get_frame_width(bit_depth):
@@ -275,7 +291,7 @@ def mediainfo_json(filepath, read_ahead_limit=-1):
             file.close()
 
     command = [prober, '-of', 'json'] + command_args
-    res = Popen(command, stdin=stdin_parameter, stdout=PIPE, stderr=PIPE)
+    res = run_command(command, stdin=stdin_parameter, stdout=PIPE, stderr=PIPE)
     output, stderr = res.communicate(input=stdin_data)
     output = output.decode("utf-8", 'ignore')
     stderr = stderr.decode("utf-8", 'ignore')

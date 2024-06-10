@@ -1,3 +1,6 @@
+# v0.25.2
+- Suppress commandline pop-ups on Windows OS
+
 # v0.25.1
 - Fix crashing bug in new scipy-powered EQ effects
 

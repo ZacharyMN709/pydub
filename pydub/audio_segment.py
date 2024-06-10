@@ -8,7 +8,7 @@ import wave
 import sys
 import struct
 from .logging_utils import log_conversion, log_subprocess_output
-from .utils import mediainfo_json, fsdecode
+from .utils import mediainfo_json, fsdecode, run_command
 import base64
 from collections import namedtuple
 
@@ -613,7 +613,7 @@ class AudioSegment(object):
         log_conversion(conversion_command)
 
         with open(os.devnull, 'rb') as devnull:
-            p = subprocess.Popen(conversion_command, stdin=devnull, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = run_command(conversion_command, stdin=devnull, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p_out, p_err = p.communicate()
 
         log_subprocess_output(p_out)
@@ -763,7 +763,7 @@ class AudioSegment(object):
 
         log_conversion(conversion_command)
 
-        p = subprocess.Popen(conversion_command, stdin=stdin_parameter,
+        p = run_command(conversion_command, stdin=stdin_parameter,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p_out, p_err = p.communicate(input=stdin_data)
 
@@ -960,7 +960,7 @@ class AudioSegment(object):
 
         # read stdin / write stdout
         with open(os.devnull, 'rb') as devnull:
-            p = subprocess.Popen(conversion_command, stdin=devnull, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = run_command(conversion_command, stdin=devnull, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p_out, p_err = p.communicate()
 
         log_subprocess_output(p_out)
